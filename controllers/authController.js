@@ -1,18 +1,131 @@
-const express = require("express");
-const mongoose = require("mongoose");
+const User = require("../models/User");
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 
-const app = express();
-const PORT = 5000;
+const { JWT_SECRET } = require("../constants/constants");
 
-app.get("/", (req, res) => {
-  res.send("Hello, World!");
-});
+const generateToken = (data) => {
+  return jwt.sign({ data }, JWT_SECRET, { expiresIn: "4h" });
+};
 
-mongoose
-  .connect(mongoURI, { useNewUrlParser: true, useUnifiedTopology: true })
-  .then(() => console.log("Connected to MongoDB"))
-  .catch((err) => console.error("Failed to connect to MongoDB", err));
+const registerUser = async (req, res) => {
+  try {
+    const {
+      name,
+      email,
+      password,
+      location,
+      isOrganization,
+      mobileNumber,
+      userId,
+    } = req.body;
 
-app.listen(port, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
-});
+    console.log(req.body);
+
+    if (!name || !email || !password || !location || !userId || !mobileNumber) {
+      return res.status(200).json({
+        statusText: "incorrect-data-sent",
+      });
+    }
+
+    const existingUser = await User.findOne({
+      email: email,
+    });
+
+    if (existingUser) {
+      return res.status(200).json({
+        statusText: "user-already-exists",
+      });
+    }
+
+    const salt = await bcrypt.genSalt(10);
+    const hash = await bcrypt.hash(password, salt);
+
+    const user = await User.create({
+      name,
+      location,
+      password: hash,
+      userId,
+      email,
+      username,
+      mobileNumber,
+      isOrganization,
+    });
+
+    if (!user) {
+      return res.status(200).json({
+        statusText: "failed",
+        userId: userId,
+      });
+    }
+    return res.status(200).json({
+      statusText: "success",
+      userId: userId,
+    });
+  } catch (error) {
+    console.log("Error from authController's register", error);
+    return res.status(500).json({
+      statusText: "failed",
+      userId: null,
+    });
+  }
+};
+
+const login = async (req, res) => {
+  try {
+    const { query, password } = req.body;
+
+    if (!query || !password) {
+      return res.status(400).json({
+        statusText: "invalid-data",
+        user: null,
+        token: null,
+      });
+    }
+
+    const existingUser = await User.findOne({
+      $or: [{ email: query }, { username: query }],
+    });
+
+    if (!existingUser) {
+      return res.status(404).json({
+        statusText: "invalid-credentials",
+        user: null,
+        token: null,
+      });
+    }
+
+    const isPasswordCorrect = await bcrypt.compare(
+      password,
+      existingUser.password
+    );
+
+    if (!isPasswordCorrect) {
+      return res.status(401).json({
+        statusText: "invalid-credentials",
+        user: null,
+        token: null,
+      });
+    }
+
+    existingUser.password = "";
+
+    return res.status(200).json({
+      statusText: "success",
+      user: existingUser,
+      token: generateToken(existingUser._id),
+    });
+  } catch (error) {
+    console.error("Error in login:", error);
+    return res.status(500).json({
+      statusText: "internal-server-error",
+      user: null,
+      token: null,
+    });
+  }
+};
+
+module.exports = {
+  login,
+  registerUser,
+};
