@@ -15,6 +15,8 @@ app.get("/", (req, res) => {
 
 app.use("/api/auth", require("./routes/authRoutes"));
 
+app.use("/api/fooditems", require("./routes/foodItemRoutes"));
+
 mongoose
   .connect(MONGO_DB_URL, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => console.log("Connected to MongoDB"))
