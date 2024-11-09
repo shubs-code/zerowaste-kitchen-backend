@@ -15,6 +15,10 @@ const foodItemSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
+    description: {
+      type: String,
+      default: "",
+    },
     expiry: {
       type: Date,
       default: Date.now(),
