@@ -92,7 +92,6 @@ const updateValue = async (req, res) => {
 const getAllFoodItems = async (req, res) => {
   try {
     const foodItems = await FoodItem.find({});
-
     return res.status(200).json({
       statusText: "success",
       foodItems: foodItems,
