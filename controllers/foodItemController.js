@@ -126,17 +126,31 @@ const donate=async(req, res)=>{
 
 const getFoodItemsByOwner = async (req, res) => {
   try {
-    const { ownerId } = req.params;
+    const { ownerId } = req.params; // Get ownerId from query params
     if (!ownerId) {
       return res.status(400).json({
         statusText: "ownerId-is-required",
       });
     }
 
-    const ownerid=new mongoose.Types.ObjectId(ownerId);
-    
-    const foodItems = await FoodItem.find({ owner: ownerid });
-    console.log(foodItems);
+    // Validate if the ownerId is a valid ObjectId
+    if (!mongoose.isValidObjectId(ownerId)) {
+      return res.status(400).json({
+        statusText: "invalid-ownerId",
+      });
+    }
+
+    // Find food items by owner
+    const foodItems = await FoodItem.find({ owner: ownerId }); // Mongoose automatically handles ObjectId conversion
+
+    if (foodItems.length === 0) {
+      return res.status(404).json({
+        statusText: "no-food-items-found",
+      });
+    }
+
+    console.log(foodItems); // You can remove this in production
+
     return res.status(200).json({
       statusText: "success",
       foodItems: foodItems,
@@ -145,9 +159,11 @@ const getFoodItemsByOwner = async (req, res) => {
     console.error("Error from getFoodItemsByOwner:", error);
     return res.status(500).json({
       statusText: "failed",
+      error: error.message,
     });
   }
 };
+
 
 module.exports = {
   addFoodItem,

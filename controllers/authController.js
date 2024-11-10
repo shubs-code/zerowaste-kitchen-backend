@@ -124,7 +124,6 @@ const login = async (req, res) => {
 const getNgo=async(req, res)=>{
   try{
     const ngos=await User.find({isOrganization: true});
-    console.log("ngos:" + ngos);
     if(ngos){
       res.status(200).json(ngos);
     }

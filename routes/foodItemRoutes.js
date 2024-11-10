@@ -8,11 +8,12 @@ const {
   updateValue,
 } = require("../controllers/foodItemController.js");
 
-const router = express.Router({ mergeParams: true });
+const router = express.Router({mergeParams: true});
+
+router.get("/:ownerId", getFoodItemsByOwner);
 
 router.get("/", getAllFoodItems);
 
-router.get("/:ownerId", getFoodItemsByOwner);
 
 router.post("/", addFoodItem);
 
