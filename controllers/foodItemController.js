@@ -1,5 +1,6 @@
 const FoodItem = require("../models/FoodItem");
 const uuid = require("uuid");
+const mongoose=require("mongoose");
 
 const addFoodItem = async (req, res) => {
   try {
@@ -113,18 +114,29 @@ const getAllFoodItems = async (req, res) => {
   }
 };
 
+const donate=async(req, res)=>{
+  try{
+    const {donatedTo, id}=req.body;
+    
+  }
+  catch(error){
+
+  }
+}
+
 const getFoodItemsByOwner = async (req, res) => {
   try {
     const { ownerId } = req.params;
-
     if (!ownerId) {
       return res.status(400).json({
         statusText: "ownerId-is-required",
       });
     }
 
-    const foodItems = await FoodItem.find({ owner: ownerId });
-
+    const ownerid=new mongoose.Types.ObjectId(ownerId);
+    
+    const foodItems = await FoodItem.find({ owner: ownerid });
+    console.log(foodItems);
     return res.status(200).json({
       statusText: "success",
       foodItems: foodItems,
@@ -143,4 +155,5 @@ module.exports = {
   updateValue,
   getAllFoodItems,
   getFoodItemsByOwner,
+  donate
 };

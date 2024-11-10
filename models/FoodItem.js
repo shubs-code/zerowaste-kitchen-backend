@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-
+const Schema=mongoose.Schema;
 const foodItemSchema = new mongoose.Schema(
   {
     id: {
@@ -28,8 +28,8 @@ const foodItemSchema = new mongoose.Schema(
       default: Date.now(),
     },
     owner: {
-      type: String,
-      default: "",
+      type: Schema.Types.ObjectId,
+      ref: "User"
     },
     hasPutToDonate: {
       type: Boolean,
