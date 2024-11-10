@@ -1,6 +1,7 @@
 const User = require("../models/User");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const uuid = require("uuid");
 
 const { JWT_SECRET } = require("../constants/constants");
 
@@ -10,19 +11,12 @@ const generateToken = (data) => {
 
 const registerUser = async (req, res) => {
   try {
-    const {
-      name,
-      email,
-      password,
-      location,
-      isOrganization,
-      mobileNumber,
-      userId,
-    } = req.body;
+    const { name, email, password, location, isOrganization, mobileNumber } =
+      req.body;
 
     console.log(req.body);
 
-    if (!name || !email || !password || !location || !userId || !mobileNumber) {
+    if (!name || !email || !password || !location || !mobileNumber) {
       return res.status(200).json({
         statusText: "incorrect-data-sent",
       });
@@ -41,13 +35,15 @@ const registerUser = async (req, res) => {
     const salt = await bcrypt.genSalt(10);
     const hash = await bcrypt.hash(password, salt);
 
+    const userId = uuid.v4();
+
     const user = await User.create({
       name,
       location,
       password: hash,
-      userId,
+      userId: userId,
       email,
-      username,
+      username: email,
       mobileNumber,
       isOrganization,
     });
@@ -55,18 +51,18 @@ const registerUser = async (req, res) => {
     if (!user) {
       return res.status(200).json({
         statusText: "failed",
-        userId: userId,
+        user: null,
       });
     }
     return res.status(200).json({
       statusText: "success",
-      userId: userId,
+      user: userId,
     });
   } catch (error) {
     console.log("Error from authController's register", error);
     return res.status(500).json({
       statusText: "failed",
-      userId: null,
+      user: null,
     });
   }
 };

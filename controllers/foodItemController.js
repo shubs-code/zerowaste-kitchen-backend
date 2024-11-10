@@ -3,9 +3,17 @@ const uuid = require("uuid");
 
 const addFoodItem = async (req, res) => {
   try {
-    const { foodItemName, quantity, expiry, owner, description } = req.body;
+    const { foodItemName, quantity, expiry, owner, description, imageUrl } =
+      req.body;
 
-    if (!foodItemName || !quantity || !expiry || !owner || !description) {
+    if (
+      !foodItemName ||
+      !quantity ||
+      !expiry ||
+      !owner ||
+      !description ||
+      !imageUrl
+    ) {
       return res.status(200).json({
         statusText: "incorrect-data-sent",
       });
@@ -17,6 +25,7 @@ const addFoodItem = async (req, res) => {
       expiry: new Date(expiry),
       owner,
       description,
+      imageUrl,
       id: uuid.v4(),
     });
 

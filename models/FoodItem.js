@@ -19,6 +19,10 @@ const foodItemSchema = new mongoose.Schema(
       type: String,
       default: "",
     },
+    imageUrl: {
+      type: String,
+      default: "",
+    },
     expiry: {
       type: Date,
       default: Date.now(),
@@ -34,6 +38,10 @@ const foodItemSchema = new mongoose.Schema(
     isDonated: {
       type: Boolean,
       default: false,
+    },
+    donatedTo: {
+      type: String,
+      default: "",
     },
     isConsumed: {
       type: Boolean,
