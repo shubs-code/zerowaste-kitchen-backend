@@ -117,10 +117,22 @@ const getAllFoodItems = async (req, res) => {
 const donate=async(req, res)=>{
   try{
     const {donatedTo, id}=req.body;
-    
+    console.log(donatedTo + " " + id);
+    const foodItem=await FoodItem.findById(id);
+    if(foodItem){
+      foodItem.findOneAndUpdate({hasPutToDonate: true, donatedTo: donatedTo})
+    }
+
+    res.status(200).json({
+      status: "success"
+    })
   }
   catch(error){
-
+    console.log(error);
+    res.status(401).json({
+      errorMsg:error,
+      status: "failure"
+    })
   }
 }
 
@@ -149,8 +161,7 @@ const getFoodItemsByOwner = async (req, res) => {
       });
     }
 
-    console.log(foodItems); // You can remove this in production
-
+    console.log(foodItems);
     return res.status(200).json({
       statusText: "success",
       foodItems: foodItems,
