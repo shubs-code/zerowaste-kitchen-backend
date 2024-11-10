@@ -1,10 +1,12 @@
 const express = require("express");
 const mongoose = require("mongoose");
+const cors = require("cors");
 
 const { MONGO_DB_URI } = require("./constants/constants");
 
 const app = express();
 app.use(express.json());
+app.use(cors("*"));
 
 const PORT = 5000;
 const MONGO_DB_URL = MONGO_DB_URI;
